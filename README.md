@@ -27,8 +27,17 @@ As players start logically swapping and replacing the glyphs, they will eventual
 
 
 # Design
-The RFID readers use the SPI interface which requires five digital pins plus Vin and Gnd. Since the digital pins can be shared by all of the readers, an Arduino mini will be used.
+The RFID readers use the SPI interface which requires five digital pins plus Vin and Gnd. Each reader needs its own SS pin, but the other digital pins can be shared. Therefore, the following pins are required:
 
+RST
+MOSI
+MISO
+SCK
+SS1
+SS2
+SS3
+SS4
+LEDs
 Four addressable LEDs will be used with Adafruit's NeoPixel library.
 
 

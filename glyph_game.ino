@@ -58,8 +58,8 @@ void loop() {
 
     int correct = 0;
     // Read all readers and check solutions
-    for (i=0; i<4; i++){
-        current_glyph = get_glyph(i);
+    for (int i=0; i<4; i++){
+        int current_glyph = get_glyph(i);
 
         // glyph in correct position
         if (current_glyph == solution[i]){
@@ -67,16 +67,16 @@ void loop() {
             correct++;
         }
         else if (current_glyph != solution[i]){
-            found = False;
+            bool found = false;
             // check for glyph in wrong position
-            for (j=0; j<4; j++){
+            for (int j=0; j<4; j++){
                 if (current_glyph == solution[j]){
-                    found = True;
+                    found = true;
                     strip.setPixelColor(i, 0, 200, 200);
                 }
             }
             // glyph not in solution set
-            if (found == False){
+            if (found == false){
                 strip.setPixelColor(i, 100, 0, 0);
             }
         }
@@ -96,7 +96,7 @@ void loop() {
             strip.setPixelColor(2, 0, 200, 0);
             strip.setPixelColor(3, 0, 200, 0);
             strip.show();
-            sleep(1000);
+            delay(1000);
             pinMode(6, LOW);
         }
         else{
@@ -110,7 +110,7 @@ void loop() {
         strip.setPixelColor(3, 0, 0, 0);
         strip.show();
         empty_readers = 0;
-        sleep(1000);
+        delay(1000);
     }
 }
 
@@ -129,7 +129,7 @@ int get_glyph(int n){
     int glyph;
 
     // Glow LED when reading
-    for (i=0; i<256; i++){
+    for (int i=0; i<256; i++){
         strip.setPixelColor(n, 100, 100, 100, i);
         strip.show();
     }
@@ -138,7 +138,7 @@ int get_glyph(int n){
     glyph = read_card();
 
 
-    for (i=0; i<256; i++){
+    for (int i=0; i<256; i++){
         strip.setPixelColor(n, 100, 100, 100, 255-i);
         strip.show();
     }
@@ -205,10 +205,10 @@ int read_card(){
     Serial.println();
 
     int cardID = buffer[0];
-    if (a == 49){
+    if (cardID == 49){
       Serial.println("Card 1");
     }
-    else if (a == 50){
+    else if (cardID == 50){
       Serial.println("Card 2");
     }
 
