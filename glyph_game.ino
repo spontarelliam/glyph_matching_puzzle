@@ -26,9 +26,15 @@ int empty_readers = 0;
 #include <MFRC522.h>
 
 #define RST_PIN         9           // Configurable, see typical pin layout above
-#define SS_PIN          10          // Configurable, see typical pin layout above
+#define SS_PIN1          5          // Configurable, see typical pin layout above
+#define SS_PIN2          6          // Configurable, see typical pin layout above
+#define SS_PIN3          7          // Configurable, see typical pin layout above
+#define SS_PIN4          8          // Configurable, see typical pin layout above
 
-MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance.
+MFRC522 mfrc522(SS_PIN1, RST_PIN);   // Create MFRC522 instance.
+MFRC522 mfrc522(SS_PIN2, RST_PIN);   // Create MFRC522 instance.
+MFRC522 mfrc522(SS_PIN3, RST_PIN);   // Create MFRC522 instance.
+MFRC522 mfrc522(SS_PIN4, RST_PIN);   // Create MFRC522 instance.
 
 MFRC522::MIFARE_Key key;
 
