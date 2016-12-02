@@ -2,11 +2,27 @@
 // by Adam Spontarelli
 
 #include <Adafruit_NeoPixel.h>
+#include <SPI.h>
+#include <MFRC522.h>
 
 #define PIN 6
 
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(4, PIN, NEO_GRB + NEO_KHZ800);
+
+
+#define RST_PIN         9           // Configurable, see typical pin layout above
+#define SS_PIN1          10          // Configurable, see typical pin layout above
+#define SS_PIN2          6          // Configurable, see typical pin layout above
+#define SS_PIN3          7          // Configurable, see typical pin layout above
+#define SS_PIN4          8          // Configurable, see typical pin layout above
+
+MFRC522 mfrc522(SS_PIN1, RST_PIN);   // Create MFRC522 instance.
+MFRC522 mfrc522_2(SS_PIN2, 10);   // Create MFRC522 instance.
+MFRC522 mfrc522_3(SS_PIN3, RST_PIN);   // Create MFRC522 instance.
+MFRC522 mfrc522_4(SS_PIN4, RST_PIN);   // Create MFRC522 instance.
+
+MFRC522::MIFARE_Key key;
 
 
 //-----------------------------------
@@ -21,22 +37,6 @@ int reader_four = 5;
 int solution[4] = {reader_one, reader_two, reader_three, reader_four};
 int current_glyphs[4] = {0};
 int empty_readers = 0;
-
-#include <SPI.h>
-#include <MFRC522.h>
-
-#define RST_PIN         9           // Configurable, see typical pin layout above
-#define SS_PIN1          5          // Configurable, see typical pin layout above
-#define SS_PIN2          6          // Configurable, see typical pin layout above
-#define SS_PIN3          7          // Configurable, see typical pin layout above
-#define SS_PIN4          8          // Configurable, see typical pin layout above
-
-MFRC522 mfrc522(SS_PIN1, RST_PIN);   // Create MFRC522 instance.
-MFRC522 mfrc522(SS_PIN2, RST_PIN);   // Create MFRC522 instance.
-MFRC522 mfrc522(SS_PIN3, RST_PIN);   // Create MFRC522 instance.
-MFRC522 mfrc522(SS_PIN4, RST_PIN);   // Create MFRC522 instance.
-
-MFRC522::MIFARE_Key key;
 
 void setup() {
     Serial.begin(9600); // Initialize serial communications with the PC
@@ -57,11 +57,17 @@ void setup() {
 
     strip.begin();
     strip.show(); // Initialize all pixels to 'off'
-    }
+
+}
 
 
 void loop() {
+  int id = 0;
+   id = read_card();
+   Serial.print("ID: ");
+   Serial.println(id);
 
+  
     int correct = 0;
     // Read all readers and check solutions
     for (int i=0; i<4; i++){
@@ -118,6 +124,8 @@ void loop() {
         empty_readers = 0;
         delay(1000);
     }
+
+    
 }
 
 /**
@@ -153,6 +161,7 @@ int get_glyph(int n){
 }
 
 int read_card(){
+    int cardID =0;
     // Look for new cards
     if ( ! mfrc522.PICC_IsNewCardPresent())
         return;
@@ -210,7 +219,7 @@ int read_card(){
     dump_byte_array(buffer, 16); Serial.println();
     Serial.println();
 
-    int cardID = buffer[0];
+    cardID = buffer[0];
     if (cardID == 49){
       Serial.println("Card 1");
     }
