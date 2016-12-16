@@ -42,6 +42,9 @@ LEDs
 The Arduino Mini has 14 digital I/O pins and will therefore meet the requirements of this project.
 
 
+The MFRC522 can take 2.7 to 3.6V. Since the LEDs require 5V, a 5V arduino with voltage divider will be needed to supply 3V to the RFID.
+
+
 ## RFID
 
 /*

@@ -5,22 +5,25 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
-#define PIN 6
+#define LEDPIN 6
 
 
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(4, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(4, LEDPIN, NEO_GRB + NEO_KHZ800);
 
 
-#define RST_PIN         9           // Configurable, see typical pin layout above
 #define SS_PIN1          10          // Configurable, see typical pin layout above
-#define SS_PIN2          6          // Configurable, see typical pin layout above
-#define SS_PIN3          7          // Configurable, see typical pin layout above
-#define SS_PIN4          8          // Configurable, see typical pin layout above
+#define RST_PIN1         9           // Configurable, see typical pin layout above
+#define SS_PIN2          2          // Configurable, see typical pin layout above
+#define RST_PIN2         3           // Configurable, see typical pin layout above
+#define SS_PIN3          4          // Configurable, see typical pin layout above
+#define RST_PIN3         5           // Configurable, see typical pin layout above
+#define SS_PIN4          7          // Configurable, see typical pin layout above
+#define RST_PIN4         8           // Configurable, see typical pin layout above
 
-MFRC522 mfrc522(SS_PIN1, RST_PIN);   // Create MFRC522 instance.
-MFRC522 mfrc522_2(SS_PIN2, 10);   // Create MFRC522 instance.
-MFRC522 mfrc522_3(SS_PIN3, RST_PIN);   // Create MFRC522 instance.
-MFRC522 mfrc522_4(SS_PIN4, RST_PIN);   // Create MFRC522 instance.
+MFRC522 mfrc522(SS_PIN1, RST_PIN1);   // Create MFRC522 instance.
+MFRC522 mfrc522_2(SS_PIN2, RST_PIN2);   // Create MFRC522 instance.
+MFRC522 mfrc522_3(SS_PIN3, RST_PIN3);   // Create MFRC522 instance.
+MFRC522 mfrc522_4(SS_PIN4, RST_PIN4);   // Create MFRC522 instance.
 
 MFRC522::MIFARE_Key key;
 
@@ -43,6 +46,10 @@ void setup() {
     while (!Serial);    // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
     SPI.begin();        // Init SPI bus
     mfrc522.PCD_Init(); // Init MFRC522 card
+    mfrc522_2.PCD_Init(); // Init MFRC522 card
+    mfrc522_3.PCD_Init(); // Init MFRC522 card
+    mfrc522_4.PCD_Init(); // Init MFRC522 card
+
 
     // Prepare the key (used both as key A and as key B)
     // using FFFFFFFFFFFFh which is the default at chip delivery from the factory
@@ -62,20 +69,21 @@ void setup() {
 
 
 void loop() {
-  int id = 0;
-   id = read_card();
+  
+   int id = 0;
+   id = read_card(0);
    Serial.print("ID: ");
    Serial.println(id);
-
-  
+   
+    
     int correct = 0;
     // Read all readers and check solutions
     for (int i=0; i<4; i++){
-        int current_glyph = get_glyph(i);
+        int current_glyph = read_card(i);
 
         // glyph in correct position
         if (current_glyph == solution[i]){
-            strip.setPixelColor(i, 0, 200, 0);
+            strip.setPixelColor(i, 0, 0, 250);
             correct++;
         }
         else if (current_glyph != solution[i]){
@@ -84,12 +92,12 @@ void loop() {
             for (int j=0; j<4; j++){
                 if (current_glyph == solution[j]){
                     found = true;
-                    strip.setPixelColor(i, 0, 200, 200);
+                    strip.setPixelColor(i, 200, 200, 0);
                 }
             }
             // glyph not in solution set
             if (found == false){
-                strip.setPixelColor(i, 100, 0, 0);
+                strip.setPixelColor(i, 0, 0, 0);
             }
         }
         // glyph not detected
@@ -138,37 +146,26 @@ void dump_byte_array(byte *buffer, byte bufferSize) {
     }
 }
 
-int get_glyph(int n){
-    // Read the glyph (RFID tag) on the nth RFID reader
-    int glyph;
-
-    // Glow LED when reading
-    for (int i=0; i<256; i++){
-        strip.setPixelColor(n, 100, 100, 100, i);
-        strip.show();
-    }
-
-    // Read RFID
-    glyph = read_card();
-
-
-    for (int i=0; i<256; i++){
-        strip.setPixelColor(n, 100, 100, 100, 255-i);
-        strip.show();
-    }
-
-    return glyph;
-}
-
-int read_card(){
+int read_card(int n){
     int cardID =0;
     // Look for new cards
     if ( ! mfrc522.PICC_IsNewCardPresent())
-        return;
+        return cardID;
 
     // Select one of the cards
     if ( ! mfrc522.PICC_ReadCardSerial())
-        return;
+        return cardID;
+
+    // Glow LED when reading
+    for (int i=0; i<256; i++){
+        strip.setPixelColor(0, 0, 0, i);
+        strip.setPixelColor(1, 0, 0, i);
+        strip.setPixelColor(2, 0, 0, i);
+        strip.setPixelColor(3, 0, 0, i);
+        strip.show();
+        delay(3);
+    }
+
 
     // Show some details of the PICC (that is: the tag/card)
     Serial.print(F("Card UID:"));
@@ -183,7 +180,7 @@ int read_card(){
         &&  piccType != MFRC522::PICC_TYPE_MIFARE_1K
         &&  piccType != MFRC522::PICC_TYPE_MIFARE_4K) {
         Serial.println(F("This sample only works with MIFARE Classic cards."));
-        return;
+        return cardID;
     }
 
     // In this sample we use the second sector,
@@ -218,6 +215,16 @@ int read_card(){
     Serial.print(F("Data in block ")); Serial.print(blockAddr); Serial.println(F(":"));
     dump_byte_array(buffer, 16); Serial.println();
     Serial.println();
+
+        for (int i=0; i<256; i++){
+      //Serial.println("test");
+        strip.setPixelColor(0, 0, 0, 255-i);
+        strip.setPixelColor(1, 0, 0, 255-i);
+        strip.setPixelColor(2, 0, 0, 255-i);
+        strip.setPixelColor(3, 0, 0, 255-i);
+        strip.show();
+        delay(3);
+    }
 
     cardID = buffer[0];
     if (cardID == 49){
