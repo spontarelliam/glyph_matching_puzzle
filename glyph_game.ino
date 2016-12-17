@@ -69,13 +69,13 @@ void setup() {
 
 
 void loop() {
-  
+
    int id = 0;
    id = read_card(0);
    Serial.print("ID: ");
    Serial.println(id);
-   
-    
+
+
     int correct = 0;
     // Read all readers and check solutions
     for (int i=0; i<4; i++){
@@ -133,7 +133,7 @@ void loop() {
         delay(1000);
     }
 
-    
+
 }
 
 /**
@@ -149,12 +149,9 @@ void dump_byte_array(byte *buffer, byte bufferSize) {
 int read_card(int n){
     int cardID =0;
     // Look for new cards
-    if ( ! mfrc522.PICC_IsNewCardPresent())
+    if ( ! mfrc522.PICC_IsNewCardPresent() && ! mfrc522_2.PICC_IsNewCardPresent() && ! mfrc522_3.PICC_IsNewCardPresent() && ! mfrc522_4.PICC_IsNewCardPresent()){
         return cardID;
-
-    // Select one of the cards
-    if ( ! mfrc522.PICC_ReadCardSerial())
-        return cardID;
+    }
 
     // Glow LED when reading
     for (int i=0; i<256; i++){
@@ -165,23 +162,48 @@ int read_card(int n){
         strip.show();
         delay(3);
     }
+    for (int i=0; i<256; i++){
+        strip.setPixelColor(0, 0, 0, 255-i);
+        strip.setPixelColor(1, 0, 0, 255-i);
+        strip.setPixelColor(2, 0, 0, 255-i);
+        strip.setPixelColor(3, 0, 0, 255-i);
+        strip.show();
+        delay(3);
+    }
 
-
-    // Show some details of the PICC (that is: the tag/card)
-    Serial.print(F("Card UID:"));
-    dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
-    Serial.println();
-    Serial.print(F("PICC type: "));
-    MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
-    Serial.println(mfrc522.PICC_GetTypeName(piccType));
-
-    // Check for compatibility
-    if (    piccType != MFRC522::PICC_TYPE_MIFARE_MINI
-        &&  piccType != MFRC522::PICC_TYPE_MIFARE_1K
-        &&  piccType != MFRC522::PICC_TYPE_MIFARE_4K) {
-        Serial.println(F("This sample only works with MIFARE Classic cards."));
+    // Select one of the cards
+    if ( mfrc522.PICC_ReadCardSerial())
+    {
+        Serial.println("reader1");
+        Serial.print(F("Card UID:"));
+        dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
+    }
+    else if ( mfrc522_2.PICC_ReadCardSerial())
+    {
+        Serial.println("reader2");
+        Serial.print(F("Card UID:"));
+        dump_byte_array(mfrc522_2.uid.uidByte, mfrc522_2.uid.size);
+    }
+    else if ( mfrc522_3.PICC_ReadCardSerial())
+    {
+        Serial.println("reader3");
+        Serial.print(F("Card UID:"));
+        dump_byte_array(mfrc522_3.uid.uidByte, mfrc522_3.uid.size);
+    }
+    else if ( mfrc522_4.PICC_ReadCardSerial())
+    {
+        Serial.println("reader4");
+        Serial.print(F("Card UID:"));
+        dump_byte_array(mfrc522_4.uid.uidByte, mfrc522_4.uid.size);
+    }
+    else{
         return cardID;
     }
+
+    // Show some details of the PICC (that is: the tag/card)
+    Serial.println();
+    MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
+    Serial.println(mfrc522.PICC_GetTypeName(piccType));
 
     // In this sample we use the second sector,
     // that is: sector #1, covering block #4 up to and including block #7
@@ -203,7 +225,6 @@ int read_card(int n){
     mfrc522.PICC_DumpMifareClassicSectorToSerial(&(mfrc522.uid), &key, sector);
     Serial.println();
 
-
     // Read data from the block
     Serial.print(F("Reading data from block ")); Serial.print(blockAddr);
     Serial.println(F(" ..."));
@@ -212,19 +233,12 @@ int read_card(int n){
         Serial.print(F("MIFARE_Read() failed: "));
         Serial.println(mfrc522.GetStatusCodeName(status));
     }
-    Serial.print(F("Data in block ")); Serial.print(blockAddr); Serial.println(F(":"));
+
+    /* Serial.print(F("Data in block ")); Serial.print(blockAddr); Serial.println(F(":")); */
     dump_byte_array(buffer, 16); Serial.println();
     Serial.println();
 
-        for (int i=0; i<256; i++){
-      //Serial.println("test");
-        strip.setPixelColor(0, 0, 0, 255-i);
-        strip.setPixelColor(1, 0, 0, 255-i);
-        strip.setPixelColor(2, 0, 0, 255-i);
-        strip.setPixelColor(3, 0, 0, 255-i);
-        strip.show();
-        delay(3);
-    }
+
 
     cardID = buffer[0];
     if (cardID == 49){
