@@ -41,6 +41,9 @@ int solution[4] = {reader_one, reader_two, reader_three, reader_four};
 int current_glyphs[4] = {0};
 int empty_readers = 0;
 
+void dump_byte_array(byte, byte);
+void read_card(int*);
+
 void setup() {
     Serial.begin(9600); // Initialize serial communications with the PC
     while (!Serial);    // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
@@ -57,10 +60,10 @@ void setup() {
         key.keyByte[i] = 0xFF;
     }
 
-    Serial.println(F("Scan a MIFARE Classic PICC to demonstrate read and write."));
-    Serial.print(F("Using key (for A and B):"));
-    dump_byte_array(key.keyByte, MFRC522::MF_KEY_SIZE);
-    Serial.println();
+    /* Serial.println(F("Scan a MIFARE Classic PICC to demonstrate read and write.")); */
+    /* Serial.print(F("Using key (for A and B):")); */
+    /* /\* dump_byte_array(key.keyByte, MFRC522::MF_KEY_SIZE); *\/ */
+    /* Serial.println(); */
 
     strip.begin();
     strip.show(); // Initialize all pixels to 'off'
@@ -69,28 +72,21 @@ void setup() {
 
 
 void loop() {
-
-   int id = 0;
-   id = read_card(0);
-   Serial.print("ID: ");
-   Serial.println(id);
-
-
     int correct = 0;
     // Read all readers and check solutions
-    for (int i=0; i<4; i++){
-        int current_glyph = read_card(i);
+    read_cards(current_glyphs*);
 
+    for (int i=0; i<4; i++){
         // glyph in correct position
-        if (current_glyph == solution[i]){
+        if (current_glyphs[i] == solution[i]){
             strip.setPixelColor(i, 0, 0, 250);
             correct++;
         }
-        else if (current_glyph != solution[i]){
+        else if (current_glyphs[i] != solution[i]){
             bool found = false;
             // check for glyph in wrong position
             for (int j=0; j<4; j++){
-                if (current_glyph == solution[j]){
+                if (current_glyphs[i] == solution[j]){
                     found = true;
                     strip.setPixelColor(i, 200, 200, 0);
                 }
@@ -132,8 +128,6 @@ void loop() {
         empty_readers = 0;
         delay(1000);
     }
-
-
 }
 
 /**
@@ -146,13 +140,27 @@ void dump_byte_array(byte *buffer, byte bufferSize) {
     }
 }
 
-int read_card(int n){
-    int cardID =0;
+void read_card(int* current_glyphs){
     // Look for new cards
-    if ( ! mfrc522.PICC_IsNewCardPresent() && ! mfrc522_2.PICC_IsNewCardPresent() && ! mfrc522_3.PICC_IsNewCardPresent() && ! mfrc522_4.PICC_IsNewCardPresent()){
-        return cardID;
+    if ( ! mfrc522.PICC_IsNewCardPresent() && ! mfrc522_2.PICC_IsNewCardPresent() &&
+         ! mfrc522_3.PICC_IsNewCardPresent() && ! mfrc522_4.PICC_IsNewCardPresent()){
+        return;
     }
 
+    byte sector         = 2;
+    byte blockAddr      = 9;
+    byte dataBlock[]    = {
+        0x01, 0x02, 0x03, 0x04, //  1,  2,   3,  4,
+        0x05, 0x06, 0x07, 0x08, //  5,  6,   7,  8,
+        0x08, 0x09, 0xff, 0x0b, //  9, 10, 255, 12,
+        0x0c, 0x0d, 0x0e, 0x0f  // 13, 14,  15, 16
+    };
+    byte trailerBlock   = 7;
+    MFRC522::StatusCode status;
+    byte buffer[18];
+    byte size = sizeof(buffer);
+
+    Serial.println("glow");
     // Glow LED when reading
     for (int i=0; i<256; i++){
         strip.setPixelColor(0, 0, 0, i);
@@ -171,54 +179,49 @@ int read_card(int n){
         delay(3);
     }
 
-    // Select one of the cards
-    if ( mfrc522.PICC_ReadCardSerial())
-    {
-        Serial.println("reader1");
-        Serial.print(F("Card UID:"));
-        dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
-    }
-    else if ( mfrc522_2.PICC_ReadCardSerial())
-    {
-        Serial.println("reader2");
-        Serial.print(F("Card UID:"));
-        dump_byte_array(mfrc522_2.uid.uidByte, mfrc522_2.uid.size);
-    }
-    else if ( mfrc522_3.PICC_ReadCardSerial())
-    {
-        Serial.println("reader3");
-        Serial.print(F("Card UID:"));
-        dump_byte_array(mfrc522_3.uid.uidByte, mfrc522_3.uid.size);
-    }
-    else if ( mfrc522_4.PICC_ReadCardSerial())
-    {
-        Serial.println("reader4");
-        Serial.print(F("Card UID:"));
-        dump_byte_array(mfrc522_4.uid.uidByte, mfrc522_4.uid.size);
-    }
-    else{
-        return cardID;
-    }
-
     // Show some details of the PICC (that is: the tag/card)
     Serial.println();
     MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
     Serial.println(mfrc522.PICC_GetTypeName(piccType));
 
-    // In this sample we use the second sector,
-    // that is: sector #1, covering block #4 up to and including block #7
-    byte sector         = 2;
-    byte blockAddr      = 9;
-    byte dataBlock[]    = {
-        0x01, 0x02, 0x03, 0x04, //  1,  2,   3,  4,
-        0x05, 0x06, 0x07, 0x08, //  5,  6,   7,  8,
-        0x08, 0x09, 0xff, 0x0b, //  9, 10, 255, 12,
-        0x0c, 0x0d, 0x0e, 0x0f  // 13, 14,  15, 16
-    };
-    byte trailerBlock   = 7;
-    MFRC522::StatusCode status;
-    byte buffer[18];
-    byte size = sizeof(buffer);
+    // Check each card
+    if ( mfrc522.PICC_ReadCardSerial())
+    {
+        Serial.println("reader1");
+        Serial.print(F("Card UID:"));
+        status = (MFRC522::StatusCode) mfrc522.MIFARE_Read(blockAddr, buffer, &size);
+        dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
+        current_glyphs[0] = buffer[0];
+    }
+    if ( mfrc522_2.PICC_ReadCardSerial())
+    {
+        Serial.println("reader2");
+        Serial.print(F("Card UID:"));
+        dump_byte_array(mfrc522_2.uid.uidByte, mfrc522_2.uid.size);
+        status = (MFRC522::StatusCode) mfrc522_2.MIFARE_Read(blockAddr, buffer, &size);
+        current_glyphs[1] = buffer[0];
+    }
+    if ( mfrc522_3.PICC_ReadCardSerial())
+    {
+        Serial.println("reader3");
+        Serial.print(F("Card UID:"));
+        dump_byte_array(mfrc522_3.uid.uidByte, mfrc522_3.uid.size);
+        status = (MFRC522::StatusCode) mfrc522_3.MIFARE_Read(blockAddr, buffer, &size);
+        current_glyphs[2] = buffer[0];
+    }
+    if ( mfrc522_4.PICC_ReadCardSerial())
+    {
+        Serial.println("reader4");
+        Serial.print(F("Card UID:"));
+        dump_byte_array(mfrc522_4.uid.uidByte, mfrc522_4.uid.size);
+        status = (MFRC522::StatusCode) mfrc522_4.MIFARE_Read(blockAddr, buffer, &size);
+        current_glyphs[3] = buffer[0];
+    }
+
+    // Show some details of the PICC (that is: the tag/card)
+    /* Serial.println(); */
+    /* MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak); */
+    /* Serial.println(mfrc522.PICC_GetTypeName(piccType)); */
 
     // Show the whole sector as it currently is
     Serial.println(F("Current data in sector:"));
@@ -229,16 +232,14 @@ int read_card(int n){
     Serial.print(F("Reading data from block ")); Serial.print(blockAddr);
     Serial.println(F(" ..."));
     status = (MFRC522::StatusCode) mfrc522.MIFARE_Read(blockAddr, buffer, &size);
-    if (status != MFRC522::STATUS_OK) {
-        Serial.print(F("MIFARE_Read() failed: "));
-        Serial.println(mfrc522.GetStatusCodeName(status));
-    }
+    /* if (status != MFRC522::STATUS_OK) { */
+    /*     Serial.print(F("MIFARE_Read() failed: ")); */
+    /*     Serial.println(mfrc522.GetStatusCodeName(status)); */
+    /* } */
 
     /* Serial.print(F("Data in block ")); Serial.print(blockAddr); Serial.println(F(":")); */
     dump_byte_array(buffer, 16); Serial.println();
     Serial.println();
-
-
 
     cardID = buffer[0];
     if (cardID == 49){
@@ -248,8 +249,8 @@ int read_card(int n){
       Serial.println("Card 2");
     }
 
-    mfrc522.PICC_HaltA();
-    mfrc522.PCD_StopCrypto1();
+    /* mfrc522.PICC_HaltA(); */
+    /* mfrc522.PCD_StopCrypto1(); */
 
-    return cardID;
+    return;
 }
