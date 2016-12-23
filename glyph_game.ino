@@ -153,20 +153,6 @@ void read_cards(int (&current_glyphs)[4]){
     byte buffer[18];
     byte size = sizeof(buffer);
 
-    Serial.println("glow");
-    // Glow LED when reading
-    for (int i=0; i<256; i++){
-        strip.setPixelColor(0, 0, 0, i);
-        strip.setPixelColor(1, 0, 0, i);
-        strip.setPixelColor(2, 0, 0, i);
-        strip.setPixelColor(3, 0, 0, i);
-        strip.show();
-        delay(1);
-    }
-
-
-
-
     // Check each card
     if ( mfrc522.PICC_ReadCardSerial())
     {
@@ -193,6 +179,7 @@ void read_cards(int (&current_glyphs)[4]){
     }
     if ( mfrc522_3.PICC_ReadCardSerial())
     {
+        Serial.println("READER 3");
         Serial.print(F("Card UID:"));
         mfrc522_3.PICC_DumpMifareClassicSectorToSerial(&(mfrc522_3.uid), &key, sector);
         status = (MFRC522::StatusCode) mfrc522_3.MIFARE_Read(blockAddr, buffer, &size);
@@ -205,6 +192,7 @@ void read_cards(int (&current_glyphs)[4]){
     }
     if ( mfrc522_4.PICC_ReadCardSerial())
     {
+        Serial.println("READER 4");
         Serial.print(F("Card UID:"));
         mfrc522_4.PICC_DumpMifareClassicSectorToSerial(&(mfrc522_4.uid), &key, sector);
         status = (MFRC522::StatusCode) mfrc522_4.MIFARE_Read(blockAddr, buffer, &size);
@@ -215,13 +203,22 @@ void read_cards(int (&current_glyphs)[4]){
         mfrc522_4.PCD_StopCrypto1();
     }
 
+    // Glow LED when reading
+    for (int i=0; i<256; i++){
+        strip.setPixelColor(0, 0, 0, i);
+        strip.setPixelColor(1, 0, 0, i);
+        strip.setPixelColor(2, 0, 0, i);
+        strip.setPixelColor(3, 0, 0, i);
+        strip.show();
+        delay(2);
+    }
     for (int i=0; i<256; i++){
         strip.setPixelColor(0, 0, 0, 255-i);
         strip.setPixelColor(1, 0, 0, 255-i);
         strip.setPixelColor(2, 0, 0, 255-i);
         strip.setPixelColor(3, 0, 0, 255-i);
         strip.show();
-        delay(1);
+        delay(2);
     }
 
     return;
