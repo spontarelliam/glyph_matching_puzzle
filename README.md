@@ -63,6 +63,17 @@ The MFRC522 can take 2.7 to 3.6V. Since the LEDs require 5V, a 5V arduino with v
  */
 
 
+Product ID is stored in Sector 2, block 9.
+dec, hex, num
+49	31	1
+50	32	2
+51	33	3
+52	34	4
+53	35	5
+54	36	6
+55	37	7
+56	38	8
+
 ## LEDs
 LEDs used in this project are from Sparkfun.
 https://www.sparkfun.com/products/12999
