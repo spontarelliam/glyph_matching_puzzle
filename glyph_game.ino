@@ -75,14 +75,21 @@ void loop() {
     int correct = 0;
     // Read all readers and check solutions
     read_cards( current_glyphs );
-    Serial.println(current_glyphs[0]);
-    Serial.println("done");
+    Serial.print(current_glyphs[0]);
+    Serial.print(", ");
+    Serial.print(current_glyphs[1]);
+    Serial.print(", ");
+    Serial.print(current_glyphs[2]);
+    Serial.print(", ");
+    Serial.println(current_glyphs[3]);
 
     for (int i=0; i<4; i++){
         // glyph in correct position
         if (current_glyphs[i] == solution[i]){
             strip.setPixelColor(i, 0, 0, 250);
             correct++;
+            Serial.print(i+1);
+            Serial.println(" Correct");
         }
         else if (current_glyphs[i] != solution[i]){
             bool found = false;
@@ -148,22 +155,15 @@ void read_cards(int (&current_glyphs)[4]){
 
     Serial.println("glow");
     // Glow LED when reading
-    /* for (int i=0; i<256; i++){ */
-    /*     strip.setPixelColor(0, 0, 0, i); */
-    /*     strip.setPixelColor(1, 0, 0, i); */
-    /*     strip.setPixelColor(2, 0, 0, i); */
-    /*     strip.setPixelColor(3, 0, 0, i); */
-    /*     strip.show(); */
-    /*     delay(1); */
-    /* } */
-    /* for (int i=0; i<256; i++){ */
-    /*     strip.setPixelColor(0, 0, 0, 255-i); */
-    /*     strip.setPixelColor(1, 0, 0, 255-i); */
-    /*     strip.setPixelColor(2, 0, 0, 255-i); */
-    /*     strip.setPixelColor(3, 0, 0, 255-i); */
-    /*     strip.show(); */
-    /*     delay(1); */
-    /* } */
+    for (int i=0; i<256; i++){
+        strip.setPixelColor(0, 0, 0, i);
+        strip.setPixelColor(1, 0, 0, i);
+        strip.setPixelColor(2, 0, 0, i);
+        strip.setPixelColor(3, 0, 0, i);
+        strip.show();
+        delay(1);
+    }
+
 
 
 
@@ -182,6 +182,7 @@ void read_cards(int (&current_glyphs)[4]){
     }
     if ( mfrc522_2.PICC_ReadCardSerial())
     {
+        Serial.println("READER 2");
         mfrc522_2.PICC_DumpMifareClassicSectorToSerial(&(mfrc522_2.uid), &key, sector);
         status = (MFRC522::StatusCode) mfrc522_2.MIFARE_Read(blockAddr, buffer, &size);
         current_glyphs[1] = buffer[0] - 48;
@@ -212,6 +213,15 @@ void read_cards(int (&current_glyphs)[4]){
         mfrc522_4.PICC_HaltA();
         // Stop encryption on PCD
         mfrc522_4.PCD_StopCrypto1();
+    }
+
+    for (int i=0; i<256; i++){
+        strip.setPixelColor(0, 0, 0, 255-i);
+        strip.setPixelColor(1, 0, 0, 255-i);
+        strip.setPixelColor(2, 0, 0, 255-i);
+        strip.setPixelColor(3, 0, 0, 255-i);
+        strip.show();
+        delay(1);
     }
 
     return;
