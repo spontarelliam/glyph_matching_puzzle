@@ -74,6 +74,8 @@ dec, hex, num
 55	37	7
 56	38	8
 
+reading should reset to zero when glyph is removed.
+
 ## LEDs
 LEDs used in this project are from Sparkfun.
 https://www.sparkfun.com/products/12999
