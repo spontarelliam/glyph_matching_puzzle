@@ -238,11 +238,7 @@ void read_cards(int (&current_glyphs)[4]){
     /* } */
 
 
-    // Look for new cards
-    /* if ( ! mfrc522_1.PICC_IsNewCardPresent() && ! mfrc522_2.PICC_IsNewCardPresent() && */
-    /*      ! mfrc522_3.PICC_IsNewCardPresent() && ! mfrc522_4.PICC_IsNewCardPresent()){ */
-    /*     return; */
-    /* } */
+
 
 
     byte sector         = 2;
@@ -252,16 +248,22 @@ void read_cards(int (&current_glyphs)[4]){
     byte size = sizeof(buffer);
 
     // Check each card
-    Serial.println(mfrc522_1.PICC_ReadCardSerial());
-    Serial.println(mfrc522_1.PICC_IsNewCardPresent());
-    /* Serial.println(mfrc522_1.PICC_ReadCardSerial()); */
-    /* Serial.println(mfrc522_1.PICC_IsNewCardPresent()); */
-    delay(3000);
-    if ( mfrc522_1.PICC_ReadCardSerial() ){
-        Serial.println(mfrc522_1.PICC_IsNewCardPresent());
-        if ( mfrc522_1.PICC_IsNewCardPresent() ){ // new card is present
+    bool serialone = mfrc522_1.PICC_ReadCardSerial();
+    bool presentone = mfrc522_1.PICC_IsNewCardPresent();
+    bool serialtwo = mfrc522_1.PICC_ReadCardSerial();
+    /* bool presenttwo = mfrc522_1.PICC_IsNewCardPresent(); */
 
-            /* Serial.print(F("Card UID:")); */
+    Serial.print(serialone);
+    Serial.print(", ");
+    Serial.print(presentone);
+    Serial.print(", ");
+    Serial.println(serialtwo);
+    /* Serial.print(", "); */
+    /* Serial.println(presenttwo); */
+    delay(1000);
+
+    if ( serialone ){ // a card is present
+        if ( presentone ){ // the card is new
             mfrc522_1.PICC_DumpMifareClassicSectorToSerial(&(mfrc522_1.uid), &key, sector);
             status = (MFRC522::StatusCode) mfrc522_1.MIFARE_Read(blockAddr, buffer, &size);
             current_glyphs[0] = buffer[0] - 48; // convert from dec to ascii
@@ -270,10 +272,22 @@ void read_cards(int (&current_glyphs)[4]){
             // Stop encryption on PCD
             mfrc522_1.PCD_StopCrypto1();
         }
+        else{
+            Serial.println("same card as before");
+        }
     }
     else{
-        current_glyphs[0] = 0;
+        Serial.println("no card present");
+        current_glyphs[0] = 0; // no card
     }
+
+
+    // Look for new cards
+    if ( ! mfrc522_1.PICC_IsNewCardPresent() && ! mfrc522_2.PICC_IsNewCardPresent() &&
+         ! mfrc522_3.PICC_IsNewCardPresent() && ! mfrc522_4.PICC_IsNewCardPresent()){
+        return;
+    }
+
 
     if ( mfrc522_2.PICC_ReadCardSerial())
     {
