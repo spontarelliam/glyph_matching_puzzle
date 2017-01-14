@@ -56,6 +56,8 @@ int empty_readers = 0;
 
 void dump_byte_array(byte, byte);
 void read_cards(int (&current_glyphs)[4]);
+void reset_game();
+void heartbeat();
 
 void setup() {
 
@@ -97,7 +99,6 @@ void setup() {
 
 }
 
-
 void heartbeat(){
     strip.setPixelColor(0, 0, 255, 0); // G, R, B
     strip.setPixelColor(1, 0, 255, 0);
@@ -133,25 +134,16 @@ void loop() {
     for (int i=0; i<4; i++){
         // glyph in correct position
         if (current_glyphs[i] == solution[i]){
-            /* strip.setPixelColor(i, 0, 0, 250); // blue */
             correct++;
             blue++;
         }
         else if (current_glyphs[i] != solution[i]){
-            bool found = false;
             // check for glyph in wrong position
             for (int j=0; j<4; j++){
                 if (current_glyphs[i] == solution[j]){
-                    /* Serial.print("Glyph #"); */
-                    /* Serial.print(i+1); */
-                    /* Serial.print(" in position"); */
-                    /* Serial.println(j+1); */
-                    found = true;
-                    /* strip.setPixelColor(i, 200, 130, 0); // yellow */
                     yellow++;
                 }
             }
-
         }
     }
 
@@ -205,8 +197,7 @@ void loop() {
             strip.setPixelColor(2, 0xFF, 0x00, 0x00);
             strip.setPixelColor(3, 0xFF, 0x00, 0x00);
             strip.show();
-            delay(5000);
-            pinMode(BUTTON, LOW);
+            reset_game();
         }
         else{
             Serial.println("you didn't win.");
@@ -215,6 +206,18 @@ void loop() {
     }
 }
 
+void reset_game(){
+    // reset game on product 20 ID tag
+    while(1){
+        read_cards( current_glyphs );
+        for (int i=0; i<4; i++){
+            if (current_glyphs[i] == 20){
+                pinMode(BUTTON, LOW);
+                return;
+            }
+        }
+    }
+}
 
 void read_cards(int (&current_glyphs)[4]){
 
