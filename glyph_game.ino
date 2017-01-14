@@ -86,6 +86,8 @@ void setup() {
 
     strip.begin();
 
+    heartbeat();
+
     // Initialize all pixels to 'off'
     strip.setPixelColor(0, 0, 0, 0); // G, R, B
     strip.setPixelColor(1, 0, 0, 0);
@@ -95,6 +97,29 @@ void setup() {
 
 }
 
+
+void heartbeat(){
+    strip.setPixelColor(0, 0, 255, 0); // G, R, B
+    strip.setPixelColor(1, 0, 255, 0);
+    strip.setPixelColor(2, 0, 255, 0);
+    strip.setPixelColor(3, 0, 255, 0);
+    strip.show();
+    delay(500);
+
+    strip.setPixelColor(0, 255, 0, 0); // G, R, B
+    strip.setPixelColor(1, 255, 0, 0);
+    strip.setPixelColor(2, 255, 0, 0);
+    strip.setPixelColor(3, 255, 0, 0);
+    strip.show();
+    delay(500);
+
+    strip.setPixelColor(0, 0, 0, 255); // G, R, B
+    strip.setPixelColor(1, 0, 0, 255);
+    strip.setPixelColor(2, 0, 0, 255);
+    strip.setPixelColor(3, 0, 0, 255);
+    strip.show();
+    delay(500);
+}
 
 void loop() {
     int correct = 0;
