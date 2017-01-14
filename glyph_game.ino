@@ -89,14 +89,6 @@ void setup() {
     strip.begin();
 
     heartbeat();
-
-    // Initialize all pixels to 'off'
-    strip.setPixelColor(0, 0, 0, 0); // G, R, B
-    strip.setPixelColor(1, 0, 0, 0);
-    strip.setPixelColor(2, 0, 0, 0);
-    strip.setPixelColor(3, 0, 0, 0);
-    strip.show();
-
 }
 
 void heartbeat(){
@@ -120,6 +112,13 @@ void heartbeat(){
     strip.setPixelColor(3, 0, 0, 255);
     strip.show();
     delay(500);
+
+    // Initialize all pixels to 'off'
+    strip.setPixelColor(0, 0, 0, 0); // G, R, B
+    strip.setPixelColor(1, 0, 0, 0);
+    strip.setPixelColor(2, 0, 0, 0);
+    strip.setPixelColor(3, 0, 0, 0);
+    strip.show();
 }
 
 void loop() {
@@ -213,6 +212,7 @@ void reset_game(){
         for (int i=0; i<4; i++){
             if (current_glyphs[i] == 20){
                 pinMode(BUTTON, LOW);
+                heartbeat();
                 return;
             }
         }
