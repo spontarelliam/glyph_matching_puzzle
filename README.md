@@ -76,6 +76,10 @@ dec, hex, num
 
 reading should reset to zero when glyph is removed.
 
+
+Do not accept reading that isn't in the solution set.
+
+
 ## LEDs
 LEDs used in this project are from Sparkfun.
 https://www.sparkfun.com/products/12999
