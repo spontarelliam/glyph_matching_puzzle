@@ -150,13 +150,14 @@ void loop() {
     }
 
     // Check that all readers have a glyph
-    Serial.print(current_glyphs[0]);
-    Serial.print(", ");
-    Serial.print(current_glyphs[1]);
-    Serial.print(", ");
-    Serial.print(current_glyphs[2]);
-    Serial.print(", ");
-    Serial.println(current_glyphs[3]);
+    /* Serial.print(current_glyphs[0]); */
+    /* Serial.print(", "); */
+    /* Serial.print(current_glyphs[1]); */
+    /* Serial.print(", "); */
+    /* Serial.print(current_glyphs[2]); */
+    /* Serial.print(", "); */
+    /* Serial.println(current_glyphs[3]);
+ */
     empty_readers = 0;
     for (int i=0; i<4; i++){
         if (current_glyphs[i] == 0){
@@ -168,13 +169,13 @@ void loop() {
     // If all readers have a glyph on them, light the LEDs
     if (empty_readers == 0){
 
-        Serial.print(current_glyphs[0]);
-        Serial.print(", ");
-        Serial.print(current_glyphs[1]);
-        Serial.print(", ");
-        Serial.print(current_glyphs[2]);
-        Serial.print(", ");
-        Serial.println(current_glyphs[3]);
+        /* Serial.print(current_glyphs[0]); */
+        /* Serial.print(", "); */
+        /* Serial.print(current_glyphs[1]); */
+        /* Serial.print(", "); */
+        /* Serial.print(current_glyphs[2]); */
+        /* Serial.print(", "); */
+        /* Serial.println(current_glyphs[3]); */
 
 
         // Color the LEDs
@@ -193,7 +194,6 @@ void loop() {
         // Check if all four are correct
         if (correct == 4){
             solved = true;
-            Serial.println("YOU WIN!");
             strip.setPixelColor(0, 0xFF, 0x00, 0x00);
             strip.setPixelColor(1, 0xFF, 0x00, 0x00);
             strip.setPixelColor(2, 0xFF, 0x00, 0x00);
@@ -205,7 +205,6 @@ void loop() {
             reset_game();
         }
         else{
-            Serial.println("you didn't win.");
             strip.show();
         }
     }
@@ -216,14 +215,14 @@ void reset_game(){
     while(1){
         read_cards( current_glyphs );
 
-        Serial.print("waiting for reset: ");
-        Serial.print(current_glyphs[0]);
-        Serial.print(", ");
-        Serial.print(current_glyphs[1]);
-        Serial.print(", ");
-        Serial.print(current_glyphs[2]);
-        Serial.print(", ");
-        Serial.println(current_glyphs[3]);
+        /* Serial.print("waiting for reset: "); */
+        /* Serial.print(current_glyphs[0]); */
+        /* Serial.print(", "); */
+        /* Serial.print(current_glyphs[1]); */
+        /* Serial.print(", "); */
+        /* Serial.print(current_glyphs[2]); */
+        /* Serial.print(", "); */
+        /* Serial.println(current_glyphs[3]); */
 
         for (int i=0; i<4; i++){
             if (current_glyphs[i] == 9){
