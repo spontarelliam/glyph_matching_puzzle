@@ -27,23 +27,9 @@ As players start logically swapping and replacing the glyphs, they will eventual
 
 
 # Design
-The RFID readers use the SPI interface which requires five digital pins plus Vin and Gnd. Each reader needs its own SS pin, but the other digital pins can be shared. In addition, four addressable LEDs will be used with Adafruit's NeoPixel library. Therefore, the following pins are required:
+The RFID readers use the SPI interface which requires five digital pins plus Vin and Gnd. However, multiple RFID readers can't be used on the same circuit. This is annoying, so someone awesome wrote a custom MFRC522 library that gets around this issue.
 
-RST
-MOSI
-MISO
-SCK
-SS1
-SS2
-SS3
-SS4
-LEDs
-
-The Arduino Mini has 14 digital I/O pins and will therefore meet the requirements of this project.
-
-
-The MFRC522 can take 2.7 to 3.6V. Since the LEDs require 5V, a 5V arduino with voltage divider will be needed to supply 3V to the RFID.
-
+https://github.com/VectorSpaceHQ/rfid
 
 ## RFID
 
@@ -64,15 +50,16 @@ The MFRC522 can take 2.7 to 3.6V. Since the LEDs require 5V, a 5V arduino with v
 
 
 Product ID is stored in Sector 2, block 9.
-dec, hex, num
-49	31	1
-50	32	2
-51	33	3
-52	34	4
-53	35	5
-54	36	6
-55	37	7
-56	38	8
+|dec| hex| num|
+|-|-|
+|49|	31|	1|
+|50|	32|	2|
+|51|	33|	3|
+|52|	34|	4|
+|53|	35|	5|
+|54|	36|	6|
+|55|	37|	7|
+|56|	38|	8|
 
 reading should reset to zero when glyph is removed.
 
@@ -91,3 +78,17 @@ https://www.sparkfun.com/products/12999
 //   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
+
+
+# Wiring
+There are four RFID readers in this particular project. So one RFID reader connects SDA to A2, while the next connects to A3, and so on.
+
+| RFID pin | Wire color | Arduino Pin |
+|--|--|--|
+| SDA | GRN | A2, A3, A4, A5 |
+| SCK | GRN/WHT | A0 |
+| MOSI | BRN | A1 |
+| MISO | BRN/WHT | D2, D3, D4, D5 |
+| GND | ORG/WHT | GND|
+| RST | BLUE | D6, D7, D8, D9 |
+| 3.3V | BLUE/WHT | 3.3V |
