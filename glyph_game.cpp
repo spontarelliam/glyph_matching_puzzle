@@ -205,7 +205,7 @@ void loop() {
             strip.setPixelColor(i, 0x00, 0x00, 0xFF);  // blue
         }
         for (int i=blue; i< (blue+yellow); i++){
-            strip.setPixelColor(i, 0xFF, 0xAF, 0x00);  // yellow
+            strip.setPixelColor(i, 0x00, 0xFF, 0x00);  // red
         }
         for (int i=(blue+yellow); i<4; i++){
             strip.setPixelColor(i, 0x00, 0x00, 0x00);
