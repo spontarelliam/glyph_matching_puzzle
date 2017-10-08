@@ -63,14 +63,14 @@ void heartbeat();
 
 void setup() {
 
-    Serial.begin(57600); // Initialize serial communications with the PC
-    while (!Serial);    // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
+    // Serial.begin(57600); // Initialize serial communications with the PC
+    // while (!Serial);    // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
 
-    Serial.println(solution[0]);
-    Serial.println(solution[1]);
-    Serial.println(solution[2]);
-    Serial.println(solution[3]);
-    delay(5000);
+    // Serial.println(solution[0]);
+    // Serial.println(solution[1]);
+    // Serial.println(solution[2]);
+    // Serial.println(solution[3]);
+    // delay(5000);
 
     mfrc522_1.PCD_Init(); // Init MFRC522 card
     mfrc522_2.PCD_Init(); // Init MFRC522 card
@@ -86,13 +86,9 @@ void setup() {
         key.keyByte[i] = 0xFF;
     }
 
-    Serial.println(F("Reader 1 Details"));
     mfrc522_1.PCD_DumpVersionToSerial();  // Show details of PCD - MFRC522 Card Reader details
-    Serial.println(F("Reader 2 Details"));
     mfrc522_2.PCD_DumpVersionToSerial();  // Show details of PCD - MFRC522 Card Reader details
-    Serial.println(F("Reader 3 Details"));
     mfrc522_3.PCD_DumpVersionToSerial();  // Show details of PCD - MFRC522 Card Reader details
-    Serial.println(F("Reader 4 Details"));
     mfrc522_4.PCD_DumpVersionToSerial();  // Show details of PCD - MFRC522 Card Reader details
 
     strip.begin();
