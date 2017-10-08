@@ -246,7 +246,7 @@ void reset_game(){
 
         for (int i=0; i<4; i++){
             if (current_glyphs[i] == 9){
-               Serial.println("9 DETECTED");
+               // Serial.println("9 DETECTED");
                 digitalWrite(DOOR, LOW);
                 digitalWrite(LIGHT, LOW);
                 heartbeat();
@@ -310,7 +310,7 @@ void read_cards(int (&current_glyphs)[4]){
 
     if ( mfrc522_1.PICC_ReadCardSerial())
     {
-        Serial.println("READER 1");
+        // Serial.println("READER 1");
         mfrc522_1.PICC_DumpMifareClassicSectorToSerial(&(mfrc522_1.uid), &key, sector);
         status = (MFRC522::StatusCode) mfrc522_1.MIFARE_Read(blockAddr, buffer, &size);
 
@@ -332,7 +332,7 @@ void read_cards(int (&current_glyphs)[4]){
 
     if ( mfrc522_2.PICC_ReadCardSerial())
     {
-        Serial.println("READER 2");
+        // Serial.println("READER 2");
         mfrc522_2.PICC_DumpMifareClassicSectorToSerial(&(mfrc522_2.uid), &key, sector);
         status = (MFRC522::StatusCode) mfrc522_2.MIFARE_Read(blockAddr, buffer, &size);
 
@@ -357,7 +357,7 @@ void read_cards(int (&current_glyphs)[4]){
 
     if ( mfrc522_3.PICC_ReadCardSerial())
     {
-        Serial.println("READER 3");
+        // Serial.println("READER 3");
         /* Serial.print(F("Card UID:")); */
         mfrc522_3.PICC_DumpMifareClassicSectorToSerial(&(mfrc522_3.uid), &key, sector);
         status = (MFRC522::StatusCode) mfrc522_3.MIFARE_Read(blockAddr, buffer, &size);
@@ -385,7 +385,7 @@ void read_cards(int (&current_glyphs)[4]){
 
     if ( mfrc522_4.PICC_ReadCardSerial())
     {
-        Serial.println("READER 4");
+        // Serial.println("READER 4");
         /* Serial.print(F("Card UID:")); */
         mfrc522_4.PICC_DumpMifareClassicSectorToSerial(&(mfrc522_4.uid), &key, sector);
         status = (MFRC522::StatusCode) mfrc522_4.MIFARE_Read(blockAddr, buffer, &size);
