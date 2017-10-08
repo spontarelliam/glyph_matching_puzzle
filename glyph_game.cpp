@@ -210,7 +210,6 @@ void loop() {
         for (int i=(blue+yellow); i<4; i++){
             strip.setPixelColor(i, 0x00, 0x00, 0x00);
         }
-        strip.show();
 
         // Check if all four are correct
         if (correct == 4){
